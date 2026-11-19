@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jojo's Counter</title>
+  <style>
+    :root { --bg: #fff8ec; --ink: #1d1a16; --accent: #ff5a36; --accent-dark: #d9431f; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #16130f; --ink: #fff3e0; --accent: #ff6b4a; --accent-dark: #e0502f; }
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      background: var(--bg); color: var(--ink);
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4vh; padding: 16px; text-align: center; overflow-x: hidden;
+    }
+    #count {
+      font-size: clamp(6rem, 35vw, 28rem); font-weight: 900; line-height: 1;
+      font-variant-numeric: tabular-nums; letter-spacing: -0.04em;
+      transition: transform 120ms ease-out;
+    }
+    #count.bump { transform: scale(1.08); }
+    button {
+      font: inherit; font-size: clamp(1.25rem, 4vw, 2rem); font-weight: 800;
+      color: #fff; background: var(--accent); border: none; border-radius: 999px;
+      padding: 0.8em 2.2em; cursor: pointer;
+      box-shadow: 0 6px 0 var(--accent-dark); transition: transform 80ms, box-shadow 80ms;
+    }
+    button:active { transform: translateY(6px); box-shadow: 0 0 0 var(--accent-dark); }
+    button:focus-visible { outline: 4px solid var(--ink); outline-offset: 4px; }
+  </style>
+</head>
+<body>
+  <div id="count" aria-live="polite">0</div>
+  <button id="plus" type="button">+1</button>
+  <script>
+    const el = document.getElementById('count');
+    const load = () => { try { return parseInt(localStorage.getItem('count'), 10) || 0; } catch { return 0; } };
+    let n = load();
+    el.textContent = n.toLocaleString();
+    // Ask the browser not to evict our saved data.
+    try { navigator.storage?.persist?.(); } catch {}
+    // Keep other open tabs in sync.
+    addEventListener('storage', e => {
+      if (e.key === 'count') { n = load(); el.textContent = n.toLocaleString(); }
+    });
+    document.getElementById('plus').addEventListener('click', () => {
+      n = Math.max(n, load()) + 1;
+      el.textContent = n.toLocaleString();
+      try { localStorage.setItem('count', n); } catch {}
+      el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+      setTimeout(() => el.classList.remove('bump'), 120);
+    });
+  </script>
+</body>
+</html>
