@@ -40,19 +40,19 @@
   <button id="plus" type="button">+1</button>
   <script>
     const el = document.getElementById('count');
-    const load = () => { try { return parseInt(localStorage.getItem('count'), 10) || 0; } catch { return 0; } };
+    const load = () => { try { return parseInt(localStorage.getItem('count-v2'), 10) || 0; } catch { return 0; } };
     let n = load();
     el.textContent = n.toLocaleString();
     // Ask the browser not to evict our saved data.
     try { navigator.storage?.persist?.(); } catch {}
     // Keep other open tabs in sync.
     addEventListener('storage', e => {
-      if (e.key === 'count') { n = load(); el.textContent = n.toLocaleString(); }
+      if (e.key === 'count-v2') { n = load(); el.textContent = n.toLocaleString(); }
     });
     document.getElementById('plus').addEventListener('click', () => {
       n = Math.max(n, load()) + 1;
       el.textContent = n.toLocaleString();
-      try { localStorage.setItem('count', n); } catch {}
+      try { localStorage.setItem('count-v2', n); } catch {}
       el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
       setTimeout(() => el.classList.remove('bump'), 120);
     });
